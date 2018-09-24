@@ -18,9 +18,10 @@
   (:import org.gephi.statistics.plugin.Modularity)
   (:import org.gephi.appearance.plugin.PartitionElementColorTransformer)
   (:import org.gephi.appearance.plugin.palette.PaletteManager)
+  (:import org.gephi.layout.plugin.noverlap.NoverlapLayout)
   (:gen-class))
 
-(def default-file-path "/Users/kiril/dot/libmain-lib.jar.dot")
+(def default-file-path "/Users/kiril/dot/libcommon-lib.jar.dot")
 
 (defn get-workspace []
   (let [pc (.. (Lookup/getDefault) (lookup ProjectController))]
@@ -57,11 +58,14 @@
 
 (defn apply-layout []
   (let [graph-model (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel))
-        auto-layout (new AutoLayout 5 TimeUnit/SECONDS)
+        auto-layout (new AutoLayout 30 TimeUnit/SECONDS)
+        no-overlap (new NoverlapLayout nil)
         force-atlas (new ForceAtlasLayout nil)
-        prop-adjust-by-size (AutoLayout/createDynamicProperty "forceAtlas.adjustSizes.name" Boolean/TRUE 1.0)]
+        prop-adjust-by-size (AutoLayout/createDynamicProperty "forceAtlas.adjustSizes.name" Boolean/TRUE 0.0)
+        prop-repulsion (AutoLayout/createDynamicProperty "forceAtlas.repulsionStrength.name" (new Double 400.0) 0.0)]
     (.. auto-layout (setGraphModel graph-model))
-    (.. auto-layout (addLayout force-atlas 1.0 (into-array [prop-adjust-by-size])))
+    (.. auto-layout (addLayout force-atlas 0.95 (into-array [prop-adjust-by-size prop-repulsion])))
+    (.. auto-layout (addLayout no-overlap 0.05))
     (.. auto-layout (execute))))
 
 (defn apply-size-by-degree []
@@ -70,7 +74,7 @@
         graph (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel) (getDirectedGraph))
         degree-ranking (.. appearance-model (getNodeFunction graph AppearanceModel$GraphFunction/NODE_DEGREE,
                                                              RankingNodeSizeTransformer))]
-    (.. degree-ranking (getTransformer) (setMinSize 8))
+    (.. degree-ranking (getTransformer) (setMinSize 6))
     (.. degree-ranking (getTransformer) (setMaxSize 40))
     (.. appearance-controller (transform degree-ranking))))
 
