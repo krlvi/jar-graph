@@ -19,6 +19,9 @@
   (:import org.gephi.appearance.plugin.PartitionElementColorTransformer)
   (:import org.gephi.appearance.plugin.palette.PaletteManager)
   (:import org.gephi.layout.plugin.noverlap.NoverlapLayout)
+  (:import org.gephi.preview.api.PreviewController)
+  (:import org.gephi.preview.api.PreviewProperty)
+  (:import org.gephi.layout.plugin.labelAdjust.LabelAdjust)
   (:gen-class))
 
 (def default-file-path "/Users/kiril/dot/libcommon-lib.jar.dot")
@@ -61,11 +64,13 @@
         auto-layout (new AutoLayout 30 TimeUnit/SECONDS)
         no-overlap (new NoverlapLayout nil)
         force-atlas (new ForceAtlasLayout nil)
+        label-adjust (new LabelAdjust nil)
         prop-adjust-by-size (AutoLayout/createDynamicProperty "forceAtlas.adjustSizes.name" Boolean/TRUE 0.0)
         prop-repulsion (AutoLayout/createDynamicProperty "forceAtlas.repulsionStrength.name" (new Double 400.0) 0.0)]
     (.. auto-layout (setGraphModel graph-model))
-    (.. auto-layout (addLayout force-atlas 0.95 (into-array [prop-adjust-by-size prop-repulsion])))
+    (.. auto-layout (addLayout force-atlas 0.90 (into-array [prop-adjust-by-size prop-repulsion])))
     (.. auto-layout (addLayout no-overlap 0.05))
+    (.. auto-layout (addLayout label-adjust 0.05))
     (.. auto-layout (execute))))
 
 (defn apply-size-by-degree []
@@ -91,11 +96,20 @@
     (.. partition (setColors (.. palette (getColors))))
     (.. appearance-controller (transform node-func))))
 
+(defn apply-labels []
+  (let [preview-controller (.. (Lookup/getDefault) (lookup PreviewController))
+        preview-model (.. preview-controller (getModel))
+        props (.. preview-model (getProperties))]
+    (.. props (putValue PreviewProperty/SHOW_NODE_LABELS Boolean/TRUE))
+    (.. props (putValue PreviewProperty/NODE_LABEL_PROPORTIONAL_SIZE Boolean/FALSE))
+    (.. props (putValue PreviewProperty/NODE_LABEL_FONT (new java.awt.Font nil 0 2)))))
+
 (defn dowork [dot-file]
   (let [workspace (get-workspace)]
     (import-to-workspace workspace dot-file)
     (apply-size-by-degree)
     (apply-color-by-partition)
+    (apply-labels)
     (apply-layout)
     (export-to-pdf workspace)))
 
