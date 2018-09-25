@@ -25,17 +25,25 @@
   (:import org.gephi.layout.plugin.labelAdjust.LabelAdjust)
   (:import org.gephi.statistics.api.StatisticsController)
   (:import org.gephi.statistics.plugin.Degree)
+  (:import org.gephi.preview.types.DependantOriginalColor)
   (:gen-class))
 
 (def default-file-path "/Users/kiril/dot/libcommon-lib.jar.dot")
 
-(defn get-workspace []
-  (let [pc (.. (Lookup/getDefault) (lookup ProjectController))]
-    (.. pc (newProject))
-    (.. pc (getCurrentWorkspace))))
+(defn look-up [class]
+  (.. (Lookup/getDefault) (lookup class)))
 
-(defn get-import-controller []
-  (.. (Lookup/getDefault) (lookup ImportController)))
+(defn graph-model []
+  (.. (look-up GraphController) (getGraphModel)))
+
+(defn workspace []
+  (let [pc (look-up ProjectController)
+        ws (.. pc (getCurrentWorkspace))]
+    (if ws
+      ws
+      (do
+        (.. pc (newProject))
+        (.. pc (getCurrentWorkspace))))))
 
 (defn get-container [file-path import-controller]
   (let [file (java.io.File. file-path)
@@ -44,54 +52,52 @@
     (.. container (getLoader) (setAllowAutoNode false))
     container))
 
-(defn import-to-workspace [workspace file-path]
-  (let [import-controller (get-import-controller)
+(defn import-to-workspace [file-path]
+  (let [import-controller (look-up ImportController)
         container (get-container file-path import-controller)
         processor (new DefaultProcessor)]
-    (.. import-controller (process container processor workspace))))
+    (.. import-controller (process container processor (workspace)))))
 
-(defn export-to-pdf [workspace]
-  (let [export-controller (.. (Lookup/getDefault) (lookup ExportController))
+(defn export-to-pdf [out-file]
+  (let [export-controller (look-up ExportController)
         pdf-exporter (.. export-controller (getExporter "pdf"))
         baos (new java.io.ByteArrayOutputStream)
-        out-file (new java.io.FileOutputStream "out.pdf")]
+        out-file (new java.io.FileOutputStream out-file)]
     (.. pdf-exporter (setPageSize com.itextpdf.text.PageSize/A0))
-    (.. pdf-exporter (setWorkspace workspace))
+    (.. pdf-exporter (setWorkspace (workspace)))
     (.. export-controller (exportStream baos pdf-exporter))
     (.. out-file (write (.. baos (toByteArray))))
     (.. baos (close))
     (.. out-file (close))))
 
-(defn apply-layout []
-  (let [graph-model (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel))
-        auto-layout (new AutoLayout 30 TimeUnit/SECONDS)
+(defn apply-layout [time-sec repulsion-strength]
+  (let [auto-layout (new AutoLayout time-sec TimeUnit/SECONDS)
         no-overlap (new NoverlapLayout nil)
         force-atlas (new ForceAtlasLayout nil)
         label-adjust (new LabelAdjust nil)
         prop-adjust-by-size (AutoLayout/createDynamicProperty "forceAtlas.adjustSizes.name" Boolean/TRUE 0.0)
-        prop-repulsion (AutoLayout/createDynamicProperty "forceAtlas.repulsionStrength.name" (new Double 400.0) 0.0)]
-    (.. auto-layout (setGraphModel graph-model))
+        prop-repulsion (AutoLayout/createDynamicProperty "forceAtlas.repulsionStrength.name" (new Double (double repulsion-strength)) 0.0)]
+    (.. auto-layout (setGraphModel (graph-model)))
     (.. auto-layout (addLayout force-atlas 0.90 (into-array [prop-adjust-by-size prop-repulsion])))
     (.. auto-layout (addLayout no-overlap 0.05))
     (.. auto-layout (addLayout label-adjust 0.05))
     (.. auto-layout (execute))))
 
-(defn apply-size-by-degree []
-  (let [appearance-controller (.. (Lookup/getDefault) (lookup AppearanceController))
+(defn apply-size-by-degree [min-size max-size]
+  (let [appearance-controller (look-up AppearanceController)
         appearance-model (.. appearance-controller (getModel))
-        graph (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel) (getDirectedGraph))
+        graph (.. (graph-model) (getDirectedGraph))
         degree-ranking (.. appearance-model (getNodeFunction graph AppearanceModel$GraphFunction/NODE_DEGREE,
                                                              RankingNodeSizeTransformer))]
-    (.. degree-ranking (getTransformer) (setMinSize 6))
-    (.. degree-ranking (getTransformer) (setMaxSize 40))
+    (.. degree-ranking (getTransformer) (setMinSize min-size))
+    (.. degree-ranking (getTransformer) (setMaxSize max-size))
     (.. appearance-controller (transform degree-ranking))))
 
 (defn apply-color-by-partition []
-  (.. (new Modularity) (execute (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel))))
-  (let [appearance-controller (.. (Lookup/getDefault) (lookup AppearanceController))
-        graph-model (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel))
-        mod-column (.. graph-model (getNodeTable) (getColumn Modularity/MODULARITY_CLASS))
-        node-func (.. appearance-controller (getModel) (getNodeFunction (.. graph-model (getDirectedGraph))
+  (.. (new Modularity) (execute (graph-model)))
+  (let [appearance-controller (look-up AppearanceController)
+        mod-column (.. (graph-model) (getNodeTable) (getColumn Modularity/MODULARITY_CLASS))
+        node-func (.. appearance-controller (getModel) (getNodeFunction (.. (graph-model) (getDirectedGraph))
                                                                           mod-column PartitionElementColorTransformer))
         partition (.. node-func (getPartition))
         palette (.. (PaletteManager/getInstance) (randomPalette (.. partition (size))))
@@ -99,16 +105,23 @@
     (.. partition (setColors (.. palette (getColors))))
     (.. appearance-controller (transform node-func))))
 
-(defn apply-labels []
-  (let [preview-controller (.. (Lookup/getDefault) (lookup PreviewController))
-        preview-model (.. preview-controller (getModel))
-        props (.. preview-model (getProperties))]
+(defn apply-labels [font-size dark-mode]
+  (let [props (.. (.. (look-up PreviewController) (getModel)) (getProperties))]
+    (.. props (putValue PreviewProperty/DIRECTED Boolean/TRUE))
+    (.. props (putValue PreviewProperty/EDGE_CURVED Boolean/FALSE))
     (.. props (putValue PreviewProperty/SHOW_NODE_LABELS Boolean/TRUE))
     (.. props (putValue PreviewProperty/NODE_LABEL_PROPORTIONAL_SIZE Boolean/FALSE))
-    (.. props (putValue PreviewProperty/NODE_LABEL_FONT (new java.awt.Font nil 0 2)))))
+    (.. props (putValue PreviewProperty/EDGE_THICKNESS 0.3))
+    (.. props (putValue PreviewProperty/EDGE_OPACITY 85))
+    (if dark-mode
+      (do
+        (.. props (putValue PreviewProperty/BACKGROUND_COLOR java.awt.Color/BLACK))
+        (.. props (putValue PreviewProperty/NODE_LABEL_COLOR (new DependantOriginalColor java.awt.Color/WHITE)))))
+    (.. props (putValue PreviewProperty/NODE_LABEL_FONT (new java.awt.Font nil 0 font-size)))
+    (.. (look-up PreviewController) (refreshPreview))))
 
 (defn get-statistics []
-  (let [graph (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel) (getDirectedGraph))
+  (let [graph (.. (graph-model) (getDirectedGraph))
         nodes (.. graph (getNodes) (toCollection))
         in-degree (map (fn [n] (.. graph (getInDegree n))) nodes)
         out-degree (map (fn [n] (.. graph (getOutDegree n))) nodes)
@@ -118,14 +131,13 @@
      :degree (freq/stats (frequencies degree))}))
 
 (defn dowork [dot-file]
-  (let [workspace (get-workspace)]
-    (import-to-workspace workspace dot-file)
-    (apply-size-by-degree)
-    (apply-color-by-partition)
-    (apply-labels)
-    (println (get-statistics))
-    (apply-layout)
-    (export-to-pdf workspace)))
+  (import-to-workspace dot-file)
+  (apply-size-by-degree 6 40)
+  (apply-color-by-partition)
+  (apply-labels 2 false)
+  (println (get-statistics))
+  (apply-layout 30 400)
+  (export-to-pdf "out.pdf"))
 
 (defn exit [msg]
   (println msg)
