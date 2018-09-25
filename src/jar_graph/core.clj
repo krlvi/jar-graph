@@ -1,31 +1,22 @@
 (ns jar-graph.core
   (:require [clojure.tools.cli :refer [parse-opts]]
             [com.stuartsierra.frequencies :as freq])
-  (:import org.openide.util.Lookup)
-  (:import org.gephi.project.api.ProjectController)
-  (:import org.gephi.io.importer.api.ImportController)
-  (:import org.gephi.io.importer.api.EdgeDirectionDefault)
-  (:import org.gephi.io.processor.plugin.DefaultProcessor)
-  (:import org.gephi.io.exporter.api.ExportController)
-  (:import org.gephi.graph.api.GraphModel)
-  (:import org.gephi.graph.api.GraphController)
-  (:import org.gephi.layout.plugin.AutoLayout)
-  (:import java.util.concurrent.TimeUnit)
-  (:import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout)
-  (:import org.gephi.appearance.api.AppearanceController)
-  (:import org.gephi.appearance.api.AppearanceModel)
-  (:import org.gephi.appearance.api.AppearanceModel$GraphFunction)
-  (:import org.gephi.appearance.plugin.RankingNodeSizeTransformer)
-  (:import org.gephi.statistics.plugin.Modularity)
-  (:import org.gephi.appearance.plugin.PartitionElementColorTransformer)
-  (:import org.gephi.appearance.plugin.palette.PaletteManager)
-  (:import org.gephi.layout.plugin.noverlap.NoverlapLayout)
-  (:import org.gephi.preview.api.PreviewController)
-  (:import org.gephi.preview.api.PreviewProperty)
-  (:import org.gephi.layout.plugin.labelAdjust.LabelAdjust)
-  (:import org.gephi.statistics.api.StatisticsController)
-  (:import org.gephi.statistics.plugin.Degree)
-  (:import org.gephi.preview.types.DependantOriginalColor)
+  (:import [java.util.concurrent TimeUnit]
+           [org.openide.util Lookup]
+           [org.gephi.project.api ProjectController]
+           [org.gephi.io.importer.api ImportController EdgeDirectionDefault]
+           [org.gephi.io.processor.plugin DefaultProcessor]
+           [org.gephi.io.exporter.api ExportController]
+           [org.gephi.graph.api GraphController]
+           [org.gephi.layout.plugin AutoLayout]
+           [org.gephi.layout.plugin.forceAtlas ForceAtlasLayout]
+           [org.gephi.appearance.api AppearanceController AppearanceModel$GraphFunction]
+           [org.gephi.appearance.plugin RankingNodeSizeTransformer PartitionElementColorTransformer]
+           [org.gephi.statistics.plugin Modularity]
+           [org.gephi.layout.plugin.noverlap NoverlapLayout]
+           [org.gephi.preview.api PreviewController PreviewProperty]
+           [org.gephi.layout.plugin.labelAdjust LabelAdjust]
+           [org.gephi.preview.types DependantOriginalColor])
   (:gen-class))
 
 (def default-file-path "/Users/kiril/dot/libcommon-lib.jar.dot")
