@@ -1,5 +1,6 @@
 (ns jar-graph.core
-  (:require [clojure.tools.cli :refer [parse-opts]])
+  (:require [clojure.tools.cli :refer [parse-opts]]
+            [com.stuartsierra.frequencies :as freq])
   (:import org.openide.util.Lookup)
   (:import org.gephi.project.api.ProjectController)
   (:import org.gephi.io.importer.api.ImportController)
@@ -22,6 +23,8 @@
   (:import org.gephi.preview.api.PreviewController)
   (:import org.gephi.preview.api.PreviewProperty)
   (:import org.gephi.layout.plugin.labelAdjust.LabelAdjust)
+  (:import org.gephi.statistics.api.StatisticsController)
+  (:import org.gephi.statistics.plugin.Degree)
   (:gen-class))
 
 (def default-file-path "/Users/kiril/dot/libcommon-lib.jar.dot")
@@ -104,12 +107,23 @@
     (.. props (putValue PreviewProperty/NODE_LABEL_PROPORTIONAL_SIZE Boolean/FALSE))
     (.. props (putValue PreviewProperty/NODE_LABEL_FONT (new java.awt.Font nil 0 2)))))
 
+(defn get-statistics []
+  (let [graph (.. (Lookup/getDefault) (lookup GraphController) (getGraphModel) (getDirectedGraph))
+        nodes (.. graph (getNodes) (toCollection))
+        in-degree (map (fn [n] (.. graph (getInDegree n))) nodes)
+        out-degree (map (fn [n] (.. graph (getOutDegree n))) nodes)
+        degree (map (fn [n] (.. graph (getDegree n))) nodes)]
+    {:in-degree (freq/stats (frequencies in-degree))
+     :out-degree (freq/stats (frequencies out-degree))
+     :degree (freq/stats (frequencies degree))}))
+
 (defn dowork [dot-file]
   (let [workspace (get-workspace)]
     (import-to-workspace workspace dot-file)
     (apply-size-by-degree)
     (apply-color-by-partition)
     (apply-labels)
+    (println (get-statistics))
     (apply-layout)
     (export-to-pdf workspace)))
 

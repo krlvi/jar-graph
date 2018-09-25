@@ -10,7 +10,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/tools.cli "0.4.1"]
-                 [org.gephi/gephi-toolkit "0.9.2"]]
+                 [org.gephi/gephi-toolkit "0.9.2"]
+                 [com.stuartsierra/frequencies "0.1.0"]]
   :main ^:skip-aot jar-graph.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
