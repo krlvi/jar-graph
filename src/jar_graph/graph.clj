@@ -119,14 +119,16 @@
     (.. baos (close))
     (.. out-file (close))))
 
-(defn analyze [dot-file draw-config]
-  (import-to-workspace dot-file)
-  (if draw-config
-    (do
-      (println draw-config)
-      (apply-size-by-degree 6 40)
-      (apply-color-by-partition)
-      (apply-labels 2 false)
-      (apply-layout 30 800)
-      (export-to-pdf "out.pdf")))
-  (gen-stats))
+(defn analyze [options]
+  (let [{:keys [dot-file skip-graph out-graph simulation-time repulsion-strength min-size max-size label-size]} options]
+    (import-to-workspace dot-file)
+    (if-not skip-graph
+      (do
+        (apply-size-by-degree min-size max-size)
+        (apply-color-by-partition)
+        (apply-labels label-size false)
+        (apply-layout simulation-time repulsion-strength)
+        (if out-graph
+          (export-to-pdf out-graph)
+          (export-to-pdf (str dot-file ".pdf")))))
+      (gen-stats)))
