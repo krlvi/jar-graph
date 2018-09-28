@@ -61,7 +61,7 @@
   (let [appearance-controller (look-up AppearanceController)
         appearance-model (.. appearance-controller (getModel))
         graph (.. (graph-model) (getDirectedGraph))
-        degree-ranking (.. appearance-model (getNodeFunction graph AppearanceModel$GraphFunction/NODE_DEGREE,
+        degree-ranking (.. appearance-model (getNodeFunction graph AppearanceModel$GraphFunction/NODE_INDEGREE,
                                                              RankingNodeSizeTransformer))]
     (.. degree-ranking (getTransformer) (setMinSize min-size))
     (.. degree-ranking (getTransformer) (setMaxSize max-size))
