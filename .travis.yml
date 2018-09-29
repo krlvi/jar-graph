@@ -1,0 +1,9 @@
+language: clojure
+script: "./bin/ci/release.sh"
+deploy:
+  provider: releases
+  api_key:
+    secure: gAW6w29gMBzCGMrfe1Tim0UIz9sN/4cVxX8mx3pWjTgQYmBsHDXA1ergqHBrT7sQ96zeIHp23uPolqrSRnvzc2XHDTwbf9uYEzg0qo9hZHtnlqc4IyGakULwfNStYSHMANxeHn2rR6OIsEEn8phlOlr6RlCHL7+Hgh6Hdoy1PrGuIWxN4wKl9Gf0p3Tku6sIRlYfag0z/w6DHfGObH31A0hj+nhesSbNDwnnDagfnBlv3escYmitbk6ZLnsXD9jd6q8SjbzwIbCJcmK6vF6nU9R6h56BDRhF5Y+8owAErMRgkR7U05KzZK3x7rHpN6azVetbUdG+HNohA+hQnx5d/un7g0l13dimvBSAnV3ZVTTDTTaIJQKrxCAEqbaEUBEVZfU1L/81I6NhFtl/9IX8WbuAWat38MmLkuISqo6RDSEXyHzzOse2CxzOcFVo6ySBlW3QeWtp3G0UKGiAPHc8fl0jDYZ79UQlPEJFGfDW9OXBV/OSRoUpE8V8NSiZednnloz8wQLxe6IhAx7DrHhlWKBeW0nykRTwAv9rAl8Kkjo2uQhV2U8h89S7NzL2fzUY/SrtlSzay6oSdHfb9wQ++Ej7vWRoHknJnLPhxlBFAQiPWPJya+4GP4+M7CZ6xcHNbHEZDr8os+pcllLmKZBbE0mYDUZD5K/v8X5ab/iRYr4=
+  file: release.zip
+  on:
+    repo: krlvi/jar-graph

@@ -11,3 +11,6 @@ pom.xml.asc
 .hg/
 .idea/
 *.iml
+/release
+release.zip
+.DS_Store
