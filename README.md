@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/krlvi/jar-graph.svg?branch=master)](https://travis-ci.org/krlvi/jar-graph)
 
-Graph analysis of the internal dependencies within a java archive file (JAR).
+Graph analysis of the internal dependencies within a java archive file (JAR) using the [gephi toolkit](https://github.com/gephi/gephi-toolkit).
 
 ## Installation
 
