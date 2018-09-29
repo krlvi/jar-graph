@@ -11,6 +11,6 @@ pom.xml.asc
 .hg/
 .idea/
 *.iml
-/release
-release.zip
+/jar-graph-release
+jar-graph-release.zip
 .DS_Store
