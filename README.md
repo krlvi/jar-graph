@@ -2,33 +2,29 @@
 
 [![Build Status](https://travis-ci.org/krlvi/jar-graph.svg?branch=master)](https://travis-ci.org/krlvi/jar-graph)
 
-FIXME: description
+Graph analysis of the internal dependencies within a java archive file (JAR).
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Required is Java 8 or later. Download [the latest release](https://github.com/krlvi/jar-graph/releases/latest) and extract the archive.
 
 ## Usage
-
-FIXME: explanation
-
-    $ java -jar jar-graph-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
+```
+usage: ./jar-graph.sh -f <jar_file> -p <package> [-t time] [-nh] [-o out_file] [-w dir] [-r repulsion] [-s font] [-m min] [-x max]
+  -t  time      specify simulation time in seconds
+  -n            no graph will be generated
+  -h            display help
+  -o  outfile   output file outfile
+  -w  workdir   working directory
+  -r  repulsion node repulsion strength value
+  -s  size      font size
+  -m  min       minimum node size
+  -x  max       maximum node size
+```
 
 ## Examples
 
-...
 
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 ## License
 
