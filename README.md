@@ -38,7 +38,7 @@ The PDF can be explored [here](./examples/elasticsearch-6.4.1.jar.pdf?raw=true).
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018 Kiril Videlov
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License.
+Thanks to Rich Hickey for creating Clojure.
