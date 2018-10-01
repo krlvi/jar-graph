@@ -34,7 +34,7 @@ The resulting PDF can be explored [here](./examples/guava-26.0-jre.jar.pdf?raw=t
 ### Elasticsearch
 `./jar-graph.sh -f ../elasticsearch-6.4.1.jar -p org.elasticsearch.common -t 180`
 This performs analysis of the [Elasticsearch 6.4.1 release](https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch/6.4.1), limited to package "org.elasticsearch.common". For large projects it is often meaningful to analyze sub-parts separately otherwise resulting graphs may be very "busy".
-The PDF can be explored [here](./examples/guava-26.0-jre.jar.pdf?raw=true).
+The PDF can be explored [here](./examples/elasticsearch-6.4.1.jar.pdf?raw=true).
 
 ## License
 
