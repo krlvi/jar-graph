@@ -1,4 +1,4 @@
-﻿# jar-graph
+# jar-graph
 
 [![Build Status](https://travis-ci.org/krlvi/jar-graph.svg?branch=master)](https://travis-ci.org/krlvi/jar-graph)
 
