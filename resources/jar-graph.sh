@@ -13,7 +13,7 @@ fi
 usage()
 {
   scriptname=$0
-  echo "usage: $scriptname -f <jar_file> -p <package> [-t time] [-nh] [-o out_file] [-w dir] [-r repulsion] [-s font] [-m min] [-x max]"
+  echo "usage: $scriptname -f <jar_file> -p <package> [-t time] [-nhi] [-o out_file] [-w dir] [-r repulsion] [-s font] [-m min] [-x max]"
   echo "  -t  time      specify simulation time in seconds"
   echo "  -n            no graph will be generated"
   echo "  -h            display help"
@@ -23,6 +23,7 @@ usage()
   echo "  -s  size      font size"
   echo "  -m  min       minimum node size"
   echo "  -x  max       maximum node size"
+  echo "  -i            list nodes and their in degree minus out degree"
 }
 
 run_jdeps()
@@ -62,6 +63,7 @@ node_repulsion_strength=800
 label_font_size=2
 node_min_size=6
 node_max_size=40
+list_nodes=
 
 if [ $# -eq 0 ]; then
     usage
@@ -103,6 +105,9 @@ while [ "$1" != "" ]; do
     -x | --max-node )   shift
                         node_max_size=$1
                         ;;
+    -i | --list-nodes ) shift
+                        list_nodes=1
+                        ;;
     * )                 usage
                         exit
                         ;;
@@ -132,6 +137,7 @@ java -jar $JAR_EXEC\
  --min-size $node_min_size\
  --max-size $node_max_size\
  --label-size $label_font_size\
- ${no_graph:+"--skip-graph"}
+ ${no_graph:+"--skip-graph"}\
+ ${list_nodes:+"--list-nodes"}
 
 cleanup_workdir $dotfile "$work_dir/summary.dot"

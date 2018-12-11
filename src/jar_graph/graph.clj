@@ -57,6 +57,15 @@
      :out-degree (freq/stats (frequencies out-degree))
      :degree (freq/stats (frequencies degree))}))
 
+(defn- indegree-minus-outdegree-list []
+  (let [graph (.. (graph-model) (getDirectedGraph))
+        nodes (.. graph (getNodes) (toCollection))]
+    (sort-by :in-minus-out
+    (map (fn [n]
+           {:name         (.getLabel n)
+            :in-minus-out (- (.. graph (getInDegree n)) (.. graph (getOutDegree n)))})
+         nodes))))
+
 (defn- apply-size-by-degree [min-size max-size]
   (let [appearance-controller (look-up AppearanceController)
         appearance-model (.. appearance-controller (getModel))
@@ -120,7 +129,9 @@
     (.. out-file (close))))
 
 (defn analyze [options]
-  (let [{:keys [dot-file skip-graph out-graph simulation-time repulsion-strength min-size max-size label-size]} options]
+  (let [{:keys [dot-file skip-graph out-graph simulation-time repulsion-strength min-size max-size label-size
+                list-nodes]}
+        options]
     (import-to-workspace dot-file)
     (if-not skip-graph
       (do
@@ -131,4 +142,6 @@
         (if out-graph
           (export-to-pdf out-graph)
           (export-to-pdf (str dot-file ".pdf")))))
-      (gen-stats)))
+    (if list-nodes
+      (indegree-minus-outdegree-list)
+      (gen-stats))))

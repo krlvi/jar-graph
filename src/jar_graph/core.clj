@@ -12,6 +12,8 @@
   [["-d" "--dot-file DOTFILE" "Path to the dot graph file to analyze"
     :required "Provide dot file to analyze"]
    ["-s" "--skip-graph" "Skip drawing graph PDF"]
+   ["-i" "--list-nodes" "List nodes and with their indegree minus outdegree"
+    :default false]
    ["-o" "--out-graph OUT" "File name of the output graph PDF"]
    ["-t" "--simulation-time TIME" "Duration of clustering simulation in seconds"
     :default 10

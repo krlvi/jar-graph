@@ -12,7 +12,8 @@ Required is Java 8 or later. Download [the latest release](https://github.com/kr
 
 ## Usage
 ```
-usage: ./jar-graph.sh -f <jar_file> -p <package> [-t time] [-nh] [-o out_file] [-w dir] [-r repulsion] [-s font] [-m min] [-x max]
+usage: ./jar-graph.sh -f <jar_file> -p <package> [-t time] [-nhi] [-o out_file] [-w dir] [-r repulsion] [-s font] [-m
+min] [-x max]
   -t  time      specify simulation time in seconds
   -n            no graph will be generated
   -h            display help
@@ -22,6 +23,7 @@ usage: ./jar-graph.sh -f <jar_file> -p <package> [-t time] [-nh] [-o out_file] [
   -s  size      font size
   -m  min       minimum node size
   -x  max       maximum node size
+  -i            list nodes and their in degree minus out degree
 ```
 
 ## Examples
